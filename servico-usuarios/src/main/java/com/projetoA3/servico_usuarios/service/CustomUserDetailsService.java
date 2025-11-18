@@ -1,0 +1,31 @@
+// Local: src/main/java/com/projetoA3/detector/service/CustomUserDetailsService.java
+package com.projetoA3.servico_usuarios.service;
+
+import com.projetoA3.servico_usuarios.entity.Usuarios;
+import com.projetoA3.servico_usuarios.repository.UsuarioRepositorio;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    @Autowired
+    private UsuarioRepositorio usuarioRepositorio;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        // Altere a chamada para usar o novo método
+        Usuarios usuario = usuarioRepositorio.findByEmailAndAtivoTrue(email)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Usuário não encontrado ou inativo com o e-mail: " + email));
+
+        return new User(usuario.getEmail(), usuario.getSenha(), new ArrayList<>());
+    }
+}
